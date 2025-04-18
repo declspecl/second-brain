@@ -1,2 +1,3 @@
 /.venv
 /mcp_agent.secrets.yaml
+/logs
