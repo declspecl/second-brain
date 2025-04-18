@@ -1,5 +1,8 @@
-import asyncio
+#!/usr/bin/env python3
+
+import os
 import time
+import asyncio
 
 from pydantic import BaseModel
 
@@ -14,10 +17,18 @@ from mcp_agent.config import (
 from mcp_agent.agents.agent import Agent
 from mcp_agent.workflows.llm.augmented_llm_google import GoogleAugmentedLLM
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 class Essay(BaseModel):
     title: str
     body: str
     conclusion: str
+
+google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+if not google_maps_api_key:
+    raise ValueError("GOOGLE_MAPS_API_KEY environment variable is not set.")
 
 settings = Settings(
     execution_engine="asyncio",
@@ -28,6 +39,21 @@ settings = Settings(
                 command="uvx",
                 args=["mcp-server-fetch"],
             ),
+            "googlemaps": MCPServerSettings(
+                command="npx",
+                args=["-y", "@modelcontextprotocol/server-google-maps"],
+                env={
+                    "GOOGLE_MAPS_API_KEY": google_maps_api_key
+                }
+            ),
+            "time": MCPServerSettings(
+                command="uvx",
+                args=["mcp-server-time"],
+            ),
+            # "sqlite": MCPServerSettings(
+            #     command="uv",
+            #     args=["--directory", "parent_of_servers_repo/servers/src/sqlite", "run", "mcp-server-sqlite", "--db-path", "~/test.db"],
+            # ),
         }
     ),
     google=GoogleSettings(
