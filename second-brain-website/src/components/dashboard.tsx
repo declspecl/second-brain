@@ -8,7 +8,6 @@ import ChatInterface from "@/components/chat-interface"
 import ActionPanel from "@/components/action-panel"
 import LiveRecording from "@/components/live-recording"
 import TextEditor from "@/components/text-editor"
-import RecentUploads from "@/components/recent-uploads"
 
 interface DashboardProps {
   mode: "personal" | "professional"
@@ -60,8 +59,6 @@ export default function Dashboard({ mode }: DashboardProps) {
           </Tabs>
         </CardContent>
       </Card>
-
-      <RecentUploads mode={mode} />
     </div>
   )
 }
