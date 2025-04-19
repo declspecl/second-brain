@@ -38,10 +38,6 @@ export default function Dashboard({ mode }: DashboardProps) {
               <TabsTrigger value="action">Take Action</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="upload" className="mt-0">
-              <FileUploader mode={mode} />
-            </TabsContent>
-
             <TabsContent value="write" className="mt-0">
               <TextEditor mode={mode} />
             </TabsContent>
@@ -52,6 +48,10 @@ export default function Dashboard({ mode }: DashboardProps) {
 
             <TabsContent value="ask" className="mt-0">
               <ChatInterface mode={mode} />
+            </TabsContent>
+
+            <TabsContent value="upload" className="mt-0">
+              <FileUploader mode={mode} />
             </TabsContent>
 
             <TabsContent value="action" className="mt-0">

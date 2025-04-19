@@ -24,14 +24,14 @@ export default function ChatInterface({ mode }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: `Welcome to your ${mode} Second Brain. How can I help you today?`,
+      content: `Welcome to your ${mode} Second Brain. I can:\n
+- Answer questions about `,
       sender: "ai",
       timestamp: new Date(),
     },
   ])
   const [input, setInput] = useState("")
   const [isTyping, setIsTyping] = useState(false);
-  const [history, setHistory] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,11 +54,6 @@ export default function ChatInterface({ mode }: ChatInterfaceProps) {
     };
 
     setMessages((prev) => [...prev, userMessage]);
-
-    // Update history
-    const newHistory = history + `User: ${input}\n`;
-    setHistory(newHistory);
-
     setInput("");
     setIsTyping(true);
 
@@ -70,7 +65,7 @@ export default function ChatInterface({ mode }: ChatInterfaceProps) {
         },
         body: JSON.stringify({
           prompt: input,
-          history: newHistory,
+          history: null,
         }),
       });
 
@@ -79,6 +74,7 @@ export default function ChatInterface({ mode }: ChatInterfaceProps) {
       }
 
       const data = await response.json();
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: data.response,
@@ -87,9 +83,6 @@ export default function ChatInterface({ mode }: ChatInterfaceProps) {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
-
-      // Update history with AI response
-      setHistory(newHistory + `AI: ${data.response}\n`);
     } catch (error: any) {
       console.error("Error sending prompt:", error);
       // Display error message in the chat
