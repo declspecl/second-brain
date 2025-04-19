@@ -1,24 +1,31 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Dashboard from "@/components/dashboard"
 import { Button } from "@/components/ui/button"
 import { UserAccountNav } from "@/components/user-account-nav"
+import { useCookies } from 'next-client-cookies';
 
 export default function Home() {
   const [mode, setMode] = useState<"personal" | "professional">("personal")
 
-  // Mock authentication state - in a real app, this would come from your auth provider
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const cookies = useCookies();
 
-  // Mock user data - in a real app, this would come from your auth provider
-  const user = {
-    name: "John Doe",
-    email: "john@example.com",
-    image: "/generic-user-icon.png",
-  }
+  // Mock authentication state - in a real app, this would come from your auth provider
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const userId = cookies.get();
+    console.log(userId);
+    if (userId) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  })
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
@@ -26,11 +33,9 @@ export default function Home() {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-bold tracking-tight">Second Brain</h1>
           <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <UserAccountNav user={user} onSignOut={() => setIsAuthenticated(false)} />
-            ) : (
+            {!isAuthenticated && (
               <Button asChild>
-                <Link href="/sign-in" onClick={() => setIsAuthenticated(true)}>
+                <Link href="/sign-in">
                   Sign In
                 </Link>
               </Button>

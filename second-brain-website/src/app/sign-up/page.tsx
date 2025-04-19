@@ -19,11 +19,8 @@ export default function SignUpPage() {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
-        password: "",
-        confirmPassword: "",
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
-    const [acceptTerms, setAcceptTerms] = useState(false)
     const router = useRouter()
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,20 +50,6 @@ export default function SignUpPage() {
             newErrors.email = "Email is invalid"
         }
 
-        if (!formData.password) {
-            newErrors.password = "Password is required"
-        } else if (formData.password.length < 8) {
-            newErrors.password = "Password must be at least 8 characters"
-        }
-
-        if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = "Passwords do not match"
-        }
-
-        if (!acceptTerms) {
-            newErrors.terms = "You must accept the terms and conditions"
-        }
-
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
@@ -80,13 +63,30 @@ export default function SignUpPage() {
 
         setIsLoading(true)
 
-        // Simulate registration delay
-        setTimeout(() => {
-        setIsLoading(false)
-        // In a real app, you would register the user and store auth tokens
-        // For demo, we'll just redirect to the sign-in page
-        router.push("/sign-in")
-        }, 1500)
+        try {
+            const response = await fetch("/api/sign-up", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                }),
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json()
+                setErrors({ api: errorData.error || "Failed to sign up" })
+                return
+            }
+
+            router.push("/sign-in")
+        } catch (error: any) {
+            setErrors({ api: error.message || "An unexpected error occurred" })
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -135,51 +135,6 @@ export default function SignUpPage() {
                             />
                             {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                         </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                name="password"
-                                type="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className={errors.password ? "border-red-500" : ""}
-                            />
-                            {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirm Password</Label>
-                            <Input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                className={errors.confirmPassword ? "border-red-500" : ""}
-                            />
-                            {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>}
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="terms"
-                                checked={acceptTerms}
-                                onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
-                                className={errors.terms ? "border-red-500" : ""}
-                            />
-                            <label
-                                htmlFor="terms"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                I accept the{" "}
-                                <Link href="#" className="text-primary hover:underline">
-                                    terms and conditions
-                                </Link>
-                            </label>
-                        </div>
-                        {errors.terms && <p className="text-xs text-red-500 mt-1">{errors.terms}</p>}
 
                         {Object.keys(errors).length > 0 && (
                             <Alert variant="destructive">
