@@ -39,6 +39,8 @@ export default function TextEditor({ mode }: TextEditorProps) {
       }
 
       const data = await response.text();
+      setContent("");
+      setIsComplete(true);
     } catch (error: any) {
       console.error("Error submitting text:", error);
     } finally {
