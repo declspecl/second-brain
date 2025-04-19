@@ -13,10 +13,44 @@ interface FileUploaderProps {
 }
 
 export default function FileUploader({ mode }: FileUploaderProps) {
-  const [fileType, setFileType] = useState("document")
-  const [isDragging, setIsDragging] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
-  const [progress, setProgress] = useState(0)
+  const [fileType, setFileType] = useState("document");
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!file) return;
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      const blob = await file.arrayBuffer();
+      formData.append("file", new Blob([blob]));
+      console.log(new Blob([blob]).text())
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "application/octet-stream",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("HTTP error! status: " + response.status);
+      }
+
+      const data = await response.json();
+      console.log("Upload successful:", data);
+    } catch (error: any) {
+      console.error("Error uploading file:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -28,38 +62,26 @@ export default function FileUploader({ mode }: FileUploaderProps) {
   }
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
+    console.log("handleDrop called");
+    e.preventDefault();
+    setIsDragging(false);
 
-    // Simulate file upload
     if (e.dataTransfer.files.length > 0) {
-      simulateUpload()
+      const droppedFile = e.dataTransfer.files[0];
+      console.log("File dropped:", droppedFile);
+      setFile(droppedFile);
+      handleSubmit();
     }
-  }
+  };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("handleFileSelect called");
+    console.log("File selected:", e.target.files);
     if (e.target.files && e.target.files.length > 0) {
-      simulateUpload()
+      setFile(e.target.files[0]);
+      handleSubmit();
     }
-  }
-
-  const simulateUpload = () => {
-    setIsUploading(true)
-    setProgress(0)
-
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setTimeout(() => {
-            setIsUploading(false)
-          }, 500)
-          return 100
-        }
-        return prev + 5
-      })
-    }, 100)
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -82,14 +104,16 @@ export default function FileUploader({ mode }: FileUploaderProps) {
             </div>
             <Label htmlFor="file-upload" className="cursor-pointer">
               <div className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
-                Select File
+                {uploading ? "Uploading..." : "Select File"}
               </div>
               <input
+                disabled={uploading}
                 id="file-upload"
                 type="file"
                 className="sr-only"
-                onChange={handleFileSelect}
-                accept={fileType === "document" ? ".pdf,.txt,.doc,.docx" : ".mp3,.wav,.m4a"}
+                onChange={(e) => {
+                  handleFileSelect(e);
+                }}
               />
             </Label>
           </div>
@@ -107,5 +131,5 @@ export default function FileUploader({ mode }: FileUploaderProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

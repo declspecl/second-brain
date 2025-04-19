@@ -19,13 +19,11 @@ export default function TextEditor({ mode }: TextEditorProps) {
   const [isComplete, setIsComplete] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiResponse, setApiResponse] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!content.trim()) return;
 
     setIsLoading(true);
-    setApiResponse(null); // Clear previous response
 
     try {
       const response = await fetch("/api/info", {
@@ -41,10 +39,8 @@ export default function TextEditor({ mode }: TextEditorProps) {
       }
 
       const data = await response.text();
-      setApiResponse(data);
     } catch (error: any) {
       console.error("Error submitting text:", error);
-      setApiResponse("Error: " + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -127,12 +123,6 @@ export default function TextEditor({ mode }: TextEditorProps) {
               )}
             </Button>
           </div>
-
-          {apiResponse && (
-            <div className="mt-4 p-4 rounded-md bg-gray-100 dark:bg-gray-800">
-              <p className="text-sm text-gray-800 dark:text-gray-200">{apiResponse}</p>
-            </div>
-          )}
         </div>
       ) : (
         <Card className="p-6">
