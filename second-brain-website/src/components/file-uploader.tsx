@@ -63,27 +63,6 @@ export default function FileUploader({ mode }: FileUploaderProps) {
 
   return (
     <div className="space-y-6">
-      <Tabs value={fileType} onValueChange={setFileType}>
-        <TabsList className="grid grid-cols-2">
-          <TabsTrigger value="document">
-            <FileText className="h-4 w-4 mr-2" />
-            Text/PDF
-          </TabsTrigger>
-          <TabsTrigger value="audio">
-            <Mic className="h-4 w-4 mr-2" />
-            Audio
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="document" className="mt-4">
-          <p className="text-sm text-muted-foreground mb-4">Upload text files or PDFs to add to your knowledge base.</p>
-        </TabsContent>
-
-        <TabsContent value="audio" className="mt-4">
-          <p className="text-sm text-muted-foreground mb-4">Upload audio recordings to be transcribed and analyzed.</p>
-        </TabsContent>
-      </Tabs>
-
       {!isUploading ? (
         <div
           className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${

@@ -2,6 +2,7 @@
 
 import type React from "react"
 
+import Markdown from "react-markdown";
 import { useState, useRef, useEffect } from "react"
 import { Send, Bot, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -24,8 +25,7 @@ export default function ChatInterface({ mode }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: `Welcome to your ${mode} Second Brain. I can:\n
-- Answer questions about `,
+      content: `Welcome to your ${mode} Second Brain. I can answer questions about you, help you with tasks, surf the web, look up locations, search Airbnb, and much more. Just ask!`,
       sender: "ai",
       timestamp: new Date(),
     },
@@ -130,11 +130,15 @@ export default function ChatInterface({ mode }: ChatInterfaceProps) {
                   )}
                 </Avatar>
                 <div
-                  className={`rounded-lg p-3 ${
+                  className={`rounded-lg p-3 max-w-[80%] overflow-x-scroll ${
                     message.sender === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
                   }`}
                 >
-                  <p className="text-sm">{message.content}</p>
+                  <div>
+                    <Markdown>
+                      {message.content}
+                    </Markdown>
+                  </div>
                   <p className="text-xs opacity-70 mt-1">
                     {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </p>

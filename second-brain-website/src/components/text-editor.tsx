@@ -14,7 +14,6 @@ interface TextEditorProps {
 }
 
 export default function TextEditor({ mode }: TextEditorProps) {
-  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -23,7 +22,7 @@ export default function TextEditor({ mode }: TextEditorProps) {
   const [apiResponse, setApiResponse] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (!title.trim() || !content.trim()) return;
+    if (!content.trim()) return;
 
     setIsLoading(true);
     setApiResponse(null); // Clear previous response
@@ -52,7 +51,6 @@ export default function TextEditor({ mode }: TextEditorProps) {
   };
 
   const handleCancel = () => {
-    setTitle("");
     setContent("");
     setSelectedFormat([]);
   };
@@ -78,16 +76,6 @@ export default function TextEditor({ mode }: TextEditorProps) {
 
       {!isComplete ? (
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="note-title">Title</Label>
-            <Input
-              id="note-title"
-              placeholder={"My " + mode + " note"}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-
           <div className="border rounded-md p-1">
             <ToggleGroup type="multiple" className="flex flex-wrap justify-start border-b p-1">
               <ToggleGroupItem value="bold" aria-label="Toggle bold" onClick={() => handleFormatText("bold")}>
@@ -125,7 +113,7 @@ export default function TextEditor({ mode }: TextEditorProps) {
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={!title.trim() || !content.trim() || isLoading}>
+            <Button onClick={handleSubmit} disabled={!content.trim() || isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />

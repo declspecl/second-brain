@@ -15,7 +15,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ mode }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState("upload")
+  const [activeTab, setActiveTab] = useState("write")
 
   return (
     <div className="space-y-6">
@@ -30,11 +30,11 @@ export default function Dashboard({ mode }: DashboardProps) {
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-5 mb-6">
-              <TabsTrigger value="upload">Upload</TabsTrigger>
+            <TabsList className="flex flex-row gap-4 sm:gap-12 flex-wrap justify-start items-center mb-6">
               <TabsTrigger value="write">Write Text</TabsTrigger>
-              <TabsTrigger value="record">Record Audio</TabsTrigger>
+              <TabsTrigger value="upload">Upload</TabsTrigger>
               <TabsTrigger value="ask">Ask</TabsTrigger>
+              <TabsTrigger value="record">Record Audio</TabsTrigger>
               <TabsTrigger value="action">Take Action</TabsTrigger>
             </TabsList>
 

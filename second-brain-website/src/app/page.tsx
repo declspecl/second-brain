@@ -5,11 +5,10 @@ import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Dashboard from "@/components/dashboard"
 import { Button } from "@/components/ui/button"
-import { UserAccountNav } from "@/components/user-account-nav"
 import { useCookies } from 'next-client-cookies';
 
 export default function Home() {
-  const [mode, setMode] = useState<"personal" | "professional">("personal")
+  const [mode, setMode] = useState<"personal" | "professional">("professional")
 
   const cookies = useCookies();
 
