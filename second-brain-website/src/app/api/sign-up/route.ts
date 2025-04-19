@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const response = NextResponse.redirect("/");
+    const response = NextResponse.redirect('https://second-brain-roan.vercel.app/');
     response.headers.set(
       'Set-Cookie',
       `user_id=${user_id}; Path=/;`
