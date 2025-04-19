@@ -81,7 +81,7 @@ export default function SignUpPage() {
                 return
             }
 
-            router.push("/sign-in")
+            router.push("/")
         } catch (error: any) {
             setErrors({ api: error.message || "An unexpected error occurred" })
         } finally {
