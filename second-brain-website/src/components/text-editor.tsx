@@ -1,0 +1,147 @@
+"use client"
+
+import { useState } from "react"
+import { Check, Bold, Italic, List, ListOrdered, Save, X, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card } from "@/components/ui/card"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+
+interface TextEditorProps {
+  mode: "personal" | "professional"
+}
+
+export default function TextEditor({ mode }: TextEditorProps) {
+  const [title, setTitle] = useState("")
+  const [content, setContent] = useState("")
+  const [isSaving, setIsSaving] = useState(false)
+  const [isComplete, setIsComplete] = useState(false)
+  const [selectedFormat, setSelectedFormat] = useState<string[]>([])
+
+  const handleSave = () => {
+    if (!title.trim() || !content.trim()) return
+
+    setIsSaving(true)
+
+    // Simulate saving delay
+    setTimeout(() => {
+      setIsSaving(false)
+      setIsComplete(true)
+
+      // Reset after showing completion
+      setTimeout(() => {
+        setIsComplete(false)
+        setTitle("")
+        setContent("")
+        setSelectedFormat([])
+      }, 2000)
+    }, 1500)
+  }
+
+  const handleCancel = () => {
+    setTitle("")
+    setContent("")
+    setSelectedFormat([])
+  }
+
+  const handleFormatText = (format: string) => {
+    // In a real implementation, this would apply formatting to the selected text
+    // For this demo, we'll just toggle the format buttons
+    if (selectedFormat.includes(format)) {
+      setSelectedFormat(selectedFormat.filter((f) => f !== format))
+    } else {
+      setSelectedFormat([...selectedFormat, format])
+    }
+  }
+
+  const formatPlaceholder =
+    mode === "personal"
+      ? "Write your personal notes, ideas, or thoughts here..."
+      : "Document your professional notes, meeting minutes, or project ideas here..."
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-muted-foreground mb-4">Write and save text directly to your knowledge base.</p>
+
+      {!isComplete ? (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="note-title">Title</Label>
+            <Input
+              id="note-title"
+              placeholder={`My ${mode} note`}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+
+          <div className="border rounded-md p-1">
+            <ToggleGroup type="multiple" className="flex flex-wrap justify-start border-b p-1">
+              <ToggleGroupItem value="bold" aria-label="Toggle bold" onClick={() => handleFormatText("bold")}>
+                <Bold className="h-4 w-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="italic" aria-label="Toggle italic" onClick={() => handleFormatText("italic")}>
+                <Italic className="h-4 w-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="bullet"
+                aria-label="Toggle bullet list"
+                onClick={() => handleFormatText("bullet")}
+              >
+                <List className="h-4 w-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="number"
+                aria-label="Toggle numbered list"
+                onClick={() => handleFormatText("number")}
+              >
+                <ListOrdered className="h-4 w-4" />
+              </ToggleGroupItem>
+            </ToggleGroup>
+
+            <Textarea
+              placeholder={formatPlaceholder}
+              className="min-h-[300px] border-0 focus-visible:ring-0 resize-none"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
+          </div>
+
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
+              <X className="h-4 w-4 mr-2" />
+              Cancel
+            </Button>
+            <Button onClick={handleSave} disabled={!title.trim() || !content.trim() || isSaving}>
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save to Second Brain
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <Card className="p-6">
+          <div className="flex flex-col items-center">
+            <div className="rounded-full bg-green-100 dark:bg-green-900 p-3 mb-4">
+              <Check className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            <h3 className="text-lg font-medium mb-2">Note Saved</h3>
+            <p className="text-sm text-muted-foreground text-center">
+              Your note has been added to your {mode} knowledge base.
+            </p>
+          </div>
+        </Card>
+      )}
+    </div>
+  )
+}
