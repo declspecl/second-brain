@@ -18,7 +18,7 @@ export default function Home() {
 
   useEffect(() => {
     // Check if user is authenticated
-    const userId = cookies.get();
+    const userId = cookies.get("user_id");
     console.log(userId);
     if (userId) {
       setIsAuthenticated(true);
