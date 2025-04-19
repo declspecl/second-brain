@@ -72,7 +72,7 @@ export default function LiveRecording({ mode }: LiveRecordingProps) {
       // Handle recording stop
       mediaRecorder.onstop = () => {
         // Create blob from recorded data
-        const blob = new Blob(chunks, { type: "audio/webm" })
+        const blob = new Blob(chunks, { type: "audio/wav" })
 
         // In a real app, you would upload this blob to your server
         console.log("Recording complete", blob)
