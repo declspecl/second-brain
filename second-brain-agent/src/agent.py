@@ -125,8 +125,9 @@ You will query the SQLite database across the information table to find relevant
 You will use the information you find to help the user.
 """
 
-async def prompt(user_id: int, history: str | None, user_input: str):
+async def send_agent_prompt(user_id: int, history: str | None, user_input: str):
     system_prompt = create_system_prompt(user_id, history, user_input)
     print(f"Prompting agent with system prompt of len {len(system_prompt)}")
-    result = await agent.run(system_prompt)
+    result = await agent.run(user_input)
+    print(f"Agent result: {result}")
     return result.output

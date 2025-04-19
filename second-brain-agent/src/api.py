@@ -1,4 +1,4 @@
-from src import agent
+from src.agent import send_agent_prompt
 from flask_cors import CORS
 from flask import Flask, request, jsonify
 
@@ -28,7 +28,7 @@ async def handle_user_prompt():
     print(f"Got user ID: {user_id}")
 
     print("Sending prompt to agent...")
-    response = await agent.prompt(int(user_id), history, prompt)
+    response = await send_agent_prompt(int(user_id), history, prompt)
     print(f"Got response from agent: {response}")
 
     response = {
