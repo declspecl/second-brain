@@ -1,6 +1,7 @@
 import asyncio
-import uvicorn  # Import uvicorn
+import uvicorn
 from src.agent import agent
+from src.sql_setup import create_schema
 
 async def run_mcp():
     print("Starting MCP servers...")
@@ -10,16 +11,15 @@ async def run_mcp():
 
 async def run_api():
     print("Starting FastAPI server with Uvicorn...")
-    config = uvicorn.Config("src.api:app", host="127.0.0.1", port=8000, reload=True, lifespan="on")
+    config = uvicorn.Config("src.api:app", host="0.0.0.0", port=8000, reload=True, lifespan="on")
     server = uvicorn.Server(config)
-    # try:
-    #     # Disable Uvicorn's signal handlers to let asyncio manage shutdown
-    #     server.install_signal_handlers = lambda: None
-    # except AttributeError:
-    #     print("Warning: install_signal_handlers attribute not found in Uvicorn Server class.")
     await server.serve()
 
 async def main():
+    print("Creating database schema...")
+    create_schema()
+    print("Database schema created.")
+
     mcp_task = asyncio.create_task(run_mcp())
     api_task = asyncio.create_task(run_api())
 

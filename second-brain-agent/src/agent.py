@@ -58,7 +58,7 @@ mcp_servers = {
             "run",
             "mcp-server-sqlite",
             "--db-path",
-            str(Path.home().joinpath("test.db"))
+            str(Path.home().joinpath("second-brain.db"))
         ]
     ),
 }
