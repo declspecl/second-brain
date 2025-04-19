@@ -1,65 +1,76 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Check, Bold, Italic, List, ListOrdered, Save, X, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card } from "@/components/ui/card"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { useState } from "react";
+import { Check, Bold, Italic, List, ListOrdered, Save, X, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface TextEditorProps {
-  mode: "personal" | "professional"
+  mode: "personal" | "professional";
 }
 
 export default function TextEditor({ mode }: TextEditorProps) {
-  const [title, setTitle] = useState("")
-  const [content, setContent] = useState("")
-  const [isSaving, setIsSaving] = useState(false)
-  const [isComplete, setIsComplete] = useState(false)
-  const [selectedFormat, setSelectedFormat] = useState<string[]>([])
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiResponse, setApiResponse] = useState<string | null>(null);
 
-  const handleSave = () => {
-    if (!title.trim() || !content.trim()) return
+  const handleSubmit = async () => {
+    if (!title.trim() || !content.trim()) return;
 
-    setIsSaving(true)
+    setIsLoading(true);
+    setApiResponse(null); // Clear previous response
 
-    // Simulate saving delay
-    setTimeout(() => {
-      setIsSaving(false)
-      setIsComplete(true)
+    try {
+      const response = await fetch("/api/info", {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        body: JSON.stringify({ content: content }),
+      });
 
-      // Reset after showing completion
-      setTimeout(() => {
-        setIsComplete(false)
-        setTitle("")
-        setContent("")
-        setSelectedFormat([])
-      }, 2000)
-    }, 1500)
-  }
+      if (!response.ok) {
+        throw new Error("HTTP error! status: " + response.status);
+      }
+
+      const data = await response.text();
+      setApiResponse(data);
+    } catch (error: any) {
+      console.error("Error submitting text:", error);
+      setApiResponse("Error: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCancel = () => {
-    setTitle("")
-    setContent("")
-    setSelectedFormat([])
-  }
+    setTitle("");
+    setContent("");
+    setSelectedFormat([]);
+  };
 
   const handleFormatText = (format: string) => {
     // In a real implementation, this would apply formatting to the selected text
     // For this demo, we'll just toggle the format buttons
     if (selectedFormat.includes(format)) {
-      setSelectedFormat(selectedFormat.filter((f) => f !== format))
+      setSelectedFormat(selectedFormat.filter((f) => f !== format));
     } else {
-      setSelectedFormat([...selectedFormat, format])
+      setSelectedFormat([...selectedFormat, format]);
     }
-  }
+  };
 
   const formatPlaceholder =
     mode === "personal"
       ? "Write your personal notes, ideas, or thoughts here..."
-      : "Document your professional notes, meeting minutes, or project ideas here..."
+      : "Document your professional notes, meeting minutes, or project ideas here...";
 
   return (
     <div className="space-y-6">
@@ -71,7 +82,7 @@ export default function TextEditor({ mode }: TextEditorProps) {
             <Label htmlFor="note-title">Title</Label>
             <Input
               id="note-title"
-              placeholder={`My ${mode} note`}
+              placeholder={"My " + mode + " note"}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -110,24 +121,30 @@ export default function TextEditor({ mode }: TextEditorProps) {
           </div>
 
           <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
+            <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={!title.trim() || !content.trim() || isSaving}>
-              {isSaving ? (
+            <Button onClick={handleSubmit} disabled={!title.trim() || !content.trim() || isLoading}>
+              {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
+                  Submitting...
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  Save to Second Brain
+                  Submit to Agent
                 </>
               )}
             </Button>
           </div>
+
+          {apiResponse && (
+            <div className="mt-4 p-4 rounded-md bg-gray-100 dark:bg-gray-800">
+              <p className="text-sm text-gray-800 dark:text-gray-200">{apiResponse}</p>
+            </div>
+          )}
         </div>
       ) : (
         <Card className="p-6">
@@ -143,5 +160,5 @@ export default function TextEditor({ mode }: TextEditorProps) {
         </Card>
       )}
     </div>
-  )
+  );
 }
