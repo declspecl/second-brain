@@ -30,19 +30,19 @@ export default function ChatInterface({ mode }: ChatInterfaceProps) {
     },
   ])
   const [input, setInput] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    scrollToBottom();
+  }, [messages]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
-  const handleSend = () => {
-    if (input.trim() === "") return
+  const handleSend = async () => {
+    if (input.trim() === "") return;
 
     // Add user message
     const userMessage: Message = {
@@ -50,43 +50,59 @@ export default function ChatInterface({ mode }: ChatInterfaceProps) {
       content: input,
       sender: "user",
       timestamp: new Date(),
-    }
+    };
 
-    setMessages((prev) => [...prev, userMessage])
-    setInput("")
-    setIsTyping(true)
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: getAIResponse(input, mode),
-        sender: "ai",
-        timestamp: new Date(),
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: input,
+          history: null,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      setMessages((prev) => [...prev, aiMessage])
-      setIsTyping(false)
-    }, 1500)
-  }
+      const data = await response.json();
 
-  const getAIResponse = (question: string, mode: string): string => {
-    // This is a placeholder. In a real app, this would call an AI service
-    const responses = [
-      `Based on your ${mode} knowledge base, I found the following information: Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-      `I've analyzed your ${mode} data and here's what I found: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
-      `According to your ${mode} second brain, the answer is: Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.`,
-    ]
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: data.response,
+        sender: "ai",
+        timestamp: new Date(),
+      };
 
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error: any) {
+      console.error("Error sending prompt:", error);
+      // Display error message in the chat
+      const errorMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        content: `Error: ${error.message}`,
+        sender: "ai",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
+      e.preventDefault();
+      handleSend();
     }
-  }
+  };
 
   return (
     <div className="flex flex-col h-[500px]">
