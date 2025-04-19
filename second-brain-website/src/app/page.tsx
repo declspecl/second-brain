@@ -1,95 +1,60 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Dashboard from "@/components/dashboard"
+import { Button } from "@/components/ui/button"
+import { UserAccountNav } from "@/components/user-account-nav"
+import { ModeToggle } from "@/components/mode-toggle"
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [mode, setMode] = useState<"personal" | "professional">("personal")
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+  // Mock authentication state - in a real app, this would come from your auth provider
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  // Mock user data - in a real app, this would come from your auth provider
+  const user = {
+    name: "John Doe",
+    email: "john@example.com",
+    image: "/generic-user-icon.png",
+  }
+
+  return (
+    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <h1 className="text-xl font-bold tracking-tight">Second Brain</h1>
+          <div className="flex items-center gap-4">
+            <ModeToggle />
+            {isAuthenticated ? (
+              <UserAccountNav user={user} onSignOut={() => setIsAuthenticated(false)} />
+            ) : (
+              <Button asChild>
+                <Link href="/sign-in" onClick={() => setIsAuthenticated(true)}>
+                  Sign In
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+      </header>
+
+      <div className="container mx-auto px-4 py-8">
+        <Tabs value={mode} onValueChange={(value) => setMode(value as "personal" | "professional")} className="mb-8">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="personal">Personal Mode</TabsTrigger>
+            <TabsTrigger value="professional">Professional Mode</TabsTrigger>
+          </TabsList>
+          <TabsContent value="personal">
+            <Dashboard mode="personal" />
+          </TabsContent>
+          <TabsContent value="professional">
+            <Dashboard mode="professional" />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </main>
+  )
 }
