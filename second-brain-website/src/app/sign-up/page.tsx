@@ -136,6 +136,16 @@ export default function SignUpPage() {
                             {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                         </div>
 
+                        <div className="space-y-2">
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                                id="password"
+                                name="password"
+                                type="password"
+                                placeholder="a_really_strong_password_123"
+                            />
+                        </div>
+
                         {Object.keys(errors).length > 0 && (
                             <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4" />
