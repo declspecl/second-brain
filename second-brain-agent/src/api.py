@@ -1,7 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
 from src.agent import send_agent_prompt
-from src.sql import add_information
+from src.sql import add_information, add_user, get_user_by_id
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, HTTPException, status, Depends
 
@@ -102,4 +102,53 @@ async def handle_save_info(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while saving to the database."
+        )
+
+class UserCreate(BaseModel):
+    username: str
+    email: str
+
+class User(BaseModel):
+    id: int
+    username: str
+    email: str
+
+
+@app.post("/api/users", response_model=User)
+async def create_user(user: UserCreate):
+    print(f"Received request to create user: {user}")
+
+    try:
+        user_id = add_user(user.username, user.email)
+        print("User created successfully.")
+
+        return User(id=user_id, username=user.username, email=user.email)
+
+    except Exception as e:
+        print(f"Error during user creation: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while creating the user."
+        )
+
+@app.get("/api/users/{user_id}", response_model=User)
+async def get_user(user_id: int):
+    print(f"Received request to get user with ID: {user_id}")
+
+    try:
+        user = get_user_by_id(user_id)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"User with ID {user_id} not found."
+            )
+        print("User retrieved successfully.")
+
+        return User(id=user[0], username=user[1], email=user[2])
+
+    except Exception as e:
+        print(f"Error during user retrieval: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while retrieving the user."
         )

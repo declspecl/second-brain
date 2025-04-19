@@ -60,3 +60,29 @@ def add_information(user_id: int, content: str) -> int:
     conn.close()
 
     return info_id
+
+def get_user_by_id(user_id: int):
+    db_path = str(Path.home().joinpath("second-brain.db"))
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT user_id, name, email FROM users WHERE user_id = ?", (user_id,))
+    user = cursor.fetchone()
+
+    conn.close()
+
+    return user
+
+def get_all_users_from_db():
+    db_path = str(Path.home().joinpath("second-brain.db"))
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT user_id, name, email FROM users")
+    users = cursor.fetchall()
+
+    conn.close()
+
+    return users

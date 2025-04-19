@@ -1,7 +1,7 @@
 import asyncio
 import uvicorn
 from src.agent import agent
-from src.sql_setup import create_schema
+from src.sql import create_schema
 
 async def run_mcp():
     print("Starting MCP servers...")
