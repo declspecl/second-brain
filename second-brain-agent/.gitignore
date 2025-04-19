@@ -2,3 +2,4 @@
 /mcp_agent.secrets.yaml
 /logs
 /.env
+/**/__pycache__
