@@ -30,3 +30,33 @@ def create_schema():
 
     conn.commit()
     conn.close()
+
+def add_user(name: str, email: str) -> int:
+    db_path = str(Path.home().joinpath("second-brain.db"))
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("INSERT INTO users (name, email) VALUES (?, ?)", (name, email))
+    user_id = cursor.lastrowid
+    assert user_id is not None, "Failed to retrieve user ID after insertion"
+
+    conn.commit()
+    conn.close()
+
+    return user_id
+
+def add_information(user_id: int, content: str) -> int:
+    db_path = str(Path.home().joinpath("second-brain.db"))
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("INSERT INTO information (fk_user_id, content) VALUES (?, ?)", (user_id, content))
+    info_id = cursor.lastrowid
+    assert info_id is not None, "Failed to retrieve information ID after insertion"
+
+    conn.commit()
+    conn.close()
+
+    return info_id

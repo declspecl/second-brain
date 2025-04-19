@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
 from src.agent import send_agent_prompt
+from src.sql import add_information
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, HTTPException, status, Depends
 
@@ -65,4 +66,40 @@ async def handle_user_prompt(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while processing your request."
+        )
+
+class SaveToDBRequest(BaseModel):
+    content: str
+
+class SaveToDBResponse(BaseModel):
+    info_id: int
+
+@app.post("/api/info", response_model=SaveToDBResponse)
+async def handle_save_info(
+    data: SaveToDBRequest,
+    user_id: int = Depends(get_user_id)
+):
+    print(f"Received request for user_id: {user_id}")
+    print(f"Content to save: {data.content}")
+
+    if not data.content or not data.content.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Content cannot be empty"
+        )
+
+    content = data.content.strip()
+
+    print("Saving content to database...")
+    try:
+        info_id = add_information(user_id, content)
+        print("Content saved successfully.")
+
+        return SaveToDBResponse(info_id=info_id)
+
+    except Exception as e:
+        print(f"Error during saving to DB: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while saving to the database."
         )
