@@ -5,31 +5,29 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SecondBrainConfig {
     pub providers: HashMap<String, ProviderConfig>,
-    pub current_provider: String,
+    pub current_provider: String
 }
 
 impl Default for SecondBrainConfig {
     fn default() -> Self {
         return Self {
             providers: HashMap::new(),
-            current_provider: String::new(),
+            current_provider: String::new()
         };
     }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProviderConfig {
-    pub name: Option<String>,
     pub description: Option<String>,
-    pub api_key: Option<String>,
+    pub api_key: Option<String>
 }
 
 impl Default for ProviderConfig {
     fn default() -> Self {
         return Self {
-            name: None,
             description: None,
-            api_key: None,
+            api_key: None
         };
     }
 }
