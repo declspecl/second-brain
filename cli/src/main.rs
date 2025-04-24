@@ -9,5 +9,11 @@ async fn main() -> anyhow::Result<()> {
 
     println!("{:#?}", args);
 
+    let config = config::read_config()?.unwrap_or_default();
+
+    println!("{:#?}", config);
+
+    config::write_config(&config)?;
+
     return Ok(());
 }
